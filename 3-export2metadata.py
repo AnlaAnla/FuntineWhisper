@@ -5,8 +5,8 @@ import numpy as np
 
 # 把导出的数据进行处理
 if __name__ == '__main__':
-    json_mini_path = r"D:\Code\ML\Audio\card_audio_data01\project-38-at-2024-09-18-16-18-e38f153a.json"
-    data_save_dir = r"D:\Code\ML\Audio\card_audio_data01\project-38-at-2024-09-18-16-17-e38f153a"
+    json_mini_path = r"C:\Code\ML\Audio\card_audio_data01\project-10-at-2024-09-23-09-07-87b7a955.json"
+    data_save_dir = r"C:\Code\ML\Audio\card_audio_data01\project-10-at-2024-09-23-09-07-87b7a955"
 
     with open(json_mini_path, "r", encoding='utf-8') as f:
         json_datas = json.load(f)

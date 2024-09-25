@@ -1,42 +1,31 @@
-import requests
-import json
+from minio import Minio
+import os
 
-# 第一个curl命令
-url = "http://localhost:8080/api/projects"
-headers = {
-    "Authorization": "Token 6e5785f3e71fcd05a3ae10d25931b9db8991aeb3",
-    "Content-Type": "application/json"
-}
-data = {
-    "title": "音频与转录项目",
-    "label_config": "<View><Audio name=\"audio\" value=\"$audio\" /><TextArea name=\"transcription\" value=\"$transcription\" toName=\"audio\" editable=\"true\" rows=\"5\" /></View>"
-}
+minio_client = Minio('truenas.lan:9000/',
+                     access_key='TQUDCSxXiw5D5hPBbm5J',
+                     secret_key='DB63Vk3qU81LQ0szSM7DyrL9rfswJG2qmjJ0BAqU',
+                     secure=False)
 
-response = requests.post(url, headers=headers, data=json.dumps(data))
-print(response.status_code)
-print(response.text)
+local_dir = r"C:\Code\ML\Audio\aaa"
 
-# 第二个curl命令
-url = "http://localhost:8080/api/projects/3/import"
-headers = {
-    "Authorization": "Token 6c85a9d2d73398271149196e1eddb63e32f9276e",
-    "Content-Type": "application/json"
-}
-data = [
-    {
-        "audio": "http://truenas.lan:9000/tencent-ts-records/audio0.mp3",
-        "transcription": "对随便划随便划"
-    },
-    {
-        "audio": "http://truenas.lan:9000/tencent-ts-records/audio1.mp3",
-        "transcription": "没事你有的时候划开"
-    },
-    {
-        "audio": "http://truenas.lan:9000/tencent-ts-records/audio2.mp3",
-        "transcription": "划破那箱子也无所谓"
-    }
-]
+# 设置存储桶名称和要上传到存储桶的目标路径前缀
+bucket_name = 'label-studio-data'
+dest_prefix = 'uploaded-dir'  # 可选,设置为None则直接上传到存储桶根目录
 
-response = requests.post(url, headers=headers, data=json.dumps(data))
-print(response.status_code)
-print(response.text)
+# 遍历本地文件夹,上传所有文件到Minio
+for root, dirs, files in os.walk(local_dir):
+    for file in files:
+        # 构造源文件路径
+        file_path = os.path.join(root, file)
+        # 保留文件夹结构,构造在Minio存储桶中的对象名称
+        object_name = os.path.relpath(file_path, local_dir)
+        object_name = object_name.replace('\\', '/')
+
+        if dest_prefix:
+            object_name = dest_prefix + '/' + object_name
+        try:
+            # 上传文件
+            minio_client.fput_object(bucket_name, object_name, file_path)
+            print(f'Uploaded {file_path} as {object_name}')
+        except Exception as e:
+            print('error: ', e)
