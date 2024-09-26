@@ -66,15 +66,11 @@ def result2srt(result, srt_save_path=None):
 
 
 if __name__ == '__main__':
-
-    model_path = "models/whisper-large-v3-finetune-ct2"
-    media_path = r"D:\Code\ML\Video\video01.mp4"
-
+    model_path = "models/whisper-medium-finetune-ct2"
+    media_path = r"D:\Code\ML\Video\merged_video.ts"
 
     # Run on GPU with FP16
     model = WhisperModel(model_path, device="cuda", compute_type="float16")
 
-
     result = media2text(media_path)
     result2srt(result)
-

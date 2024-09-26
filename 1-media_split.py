@@ -13,6 +13,7 @@ import shutil
 
 video_match_list = [".mp4", ".avi"]
 
+
 # whisper截取字幕
 def save_srt(_media_path: str):
     _srt_save_path = os.path.join(data_save_dir, os.path.splitext(os.path.split(_media_path)[-1])[0] + ".srt")
@@ -65,7 +66,7 @@ def save_srt(_media_path: str):
 
 
 # 判断一段拼音是否在文本中
-def is_have_pinyin(judge_text: str, judge_word:str):
+def is_have_pinyin(judge_text: str, judge_word: str):
     data = pypinyin.lazy_pinyin(judge_text)
     sentence = " ".join(data)
     if judge_word in sentence:
@@ -99,6 +100,7 @@ def get_text_time(srt_path, judge_word=None):
             audio_text_datas.append(result)
 
     return audio_text_datas
+
 
 # 根据字幕截取音频
 def split_audio4srt(_media_path: str, _srt_save_path: str):
@@ -147,11 +149,9 @@ def split_audio4srt(_media_path: str, _srt_save_path: str):
     print('处理结束')
 
 
-
-
 if __name__ == '__main__':
     # 数据路径
-    media_path = r"D:\Code\ML\Video\card_video\2024_09_11 13_15_31.mp4"
+    media_path = r"D:\Code\ML\Video\merged_video.ts"
     data_save_dir = r"D:\Code\ML\Audio\card_audio_data01"
 
     os.environ['KMP_DUPLICATE_LIB_OK'] = 'True'
@@ -168,4 +168,3 @@ if __name__ == '__main__':
 
     # 切割音频数据, 生成训练数据
     split_audio4srt(media_path, srt_save_path)
-

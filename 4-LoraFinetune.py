@@ -65,14 +65,15 @@ class DataCollatorSpeechSeq2SeqWithPadding:
 def make_inputs_require_grad(module, input, output):
     output.requires_grad_(True)
 
+
 # This callback helps to save only the adapter weights and remove the base model weights.
 class SavePeftModelCallback(TrainerCallback):
     def on_save(
-        self,
-        args: TrainingArguments,
-        state: TrainerState,
-        control: TrainerControl,
-        **kwargs,
+            self,
+            args: TrainingArguments,
+            state: TrainerState,
+            control: TrainerControl,
+            **kwargs,
     ):
         checkpoint_folder = os.path.join(args.output_dir, f"{PREFIX_CHECKPOINT_DIR}-{state.global_step}")
 
@@ -84,14 +85,16 @@ class SavePeftModelCallback(TrainerCallback):
             os.remove(pytorch_model_path)
         return control
 
+
 if __name__ == '__main__':
     os.environ["CUDA_VISIBLE_DEVICES"] = "0"
 
-    model_name_or_path = "openai/whisper-large-v3"
+    # model_name_or_path = "openai/whisper-large-v3"
+    model_name_or_path = "openai/whisper-medium"
     task = "transcribe"
 
     # 此处加载我的数据集
-    dataset_name = r"D:\Code\ML\Audio\card_audio_data01\project-38-at-2024-09-18-16-17-e38f153a"
+    dataset_name = r"D:\Code\ML\Audio\card_audio_data01\project-10-at-2024-09-23-09-07-87b7a955"
     language = "Chinese"
 
     common_voice = DatasetDict()
@@ -105,7 +108,6 @@ if __name__ == '__main__':
     feature_extractor = WhisperFeatureExtractor.from_pretrained(model_name_or_path)
     tokenizer = WhisperTokenizer.from_pretrained(model_name_or_path, language=language, task=task)
     processor = WhisperProcessor.from_pretrained(model_name_or_path, language=language, task=task)
-
 
     common_voice = common_voice.map(prepare_dataset, remove_columns=common_voice.column_names["train"], num_proc=1)
     data_collator = DataCollatorSpeechSeq2SeqWithPadding(processor=processor)
@@ -123,8 +125,6 @@ if __name__ == '__main__':
     # 查看参与训练的参数
     model = get_peft_model(model, config)
     model.print_trainable_parameters()
-
-
 
     training_args = Seq2SeqTrainingArguments(
         output_dir="reach-vb/train",  # change to a repo name of your choice
