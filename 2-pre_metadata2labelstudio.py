@@ -65,7 +65,7 @@ def upload_labelStudio(project_id):
     remote_data_server_url = f"http://{remote_data_server_ip}/label-studio-data/"
     url = f"{label_studio_url}/api/projects/{project_id}/import"
     headers = {
-        "Authorization": "Token 6e5785f3e71fcd05a3ae10d25931b9db8991aeb3",
+        "Authorization": f"Token {label_studio_token}",
         "Content-Type": "application/json"
     }
 
