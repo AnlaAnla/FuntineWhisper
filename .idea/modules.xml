@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/.idea/FuntineWhisper.iml" filepath="$PROJECT_DIR$/.idea/FuntineWhisper.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/FinetuneWhisper.iml" filepath="$PROJECT_DIR$/.idea/FinetuneWhisper.iml" />
     </modules>
   </component>
 </project>

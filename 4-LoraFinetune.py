@@ -94,7 +94,7 @@ if __name__ == '__main__':
     task = "transcribe"
 
     # 此处加载我的数据集
-    dataset_name = r"D:\Code\ML\Audio\card_audio_data01\project-10-at-2024-09-23-09-07-87b7a955"
+    dataset_name = r"D:\Code\ML\Audio\card_audio_data02"
     language = "Chinese"
 
     common_voice = DatasetDict()

@@ -57,6 +57,7 @@ def result2srt(result, srt_save_path=None):
             )
 
     if srt_save_path is not None:
+
         # 保存SRT字幕文件
         srt_file = srt.compose(subtitles)
         with open(srt_save_path, "w", encoding="utf-8") as f:
@@ -67,10 +68,10 @@ def result2srt(result, srt_save_path=None):
 
 if __name__ == '__main__':
     model_path = "models/whisper-medium-finetune-ct2"
-    media_path = r"D:\Code\ML\Video\merged_video.ts"
+    media_path = r"D:\Code\ML\Audio\t7.mp3"
 
     # Run on GPU with FP16
     model = WhisperModel(model_path, device="cuda", compute_type="float16")
 
     result = media2text(media_path)
-    result2srt(result)
+    result2srt(result, r"D:\Code\ML\Audio\t7.srt")
