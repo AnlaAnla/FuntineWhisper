@@ -1,17 +1,32 @@
-import requests
+import os
+import json
+from zipfile import ZipFile
+import ffmpeg
+from glob import glob
+import time
 
-# curl -X GET http://192.168.66.117:8081/api/projects/{id}/export?exportType=JSON&download_all_tasks=true
+def download_m3u8(url, save_folder):
+    # response = requests.get(url, stream=True)
+    loc_time = time.strftime('%Y-%m-%d-%H-%M-%S')
+    filename = url.split('/')[-1]
+    os.makedirs(save_folder, exist_ok=True)
+    temp_folder = "temp"
+    os.makedirs(temp_folder, exist_ok=True)
+    file_path = os.path.join(save_folder, filename)
 
-label_studio_url = "http://192.168.66.117:8081"
-label_studio_token = "6e5785f3e71fcd05a3ae10d25931b9db8991aeb3"
-project_id = 10
+    # 使用 ffmpeg 将 M3U8 流保存为多个临时文件
+    stream = ffmpeg.input(url)
+    stream = ffmpeg.output(stream, os.path.join(temp_folder, 'chunk_%03d.ts'))
+    ffmpeg.run(stream)
 
-url = f"{label_studio_url}/api/projects/{project_id}/export?exportType=JSON"
-headers = {
-    "Authorization": "Token 6e5785f3e71fcd05a3ae10d25931b9db8991aeb3",
-    "Content-Type": "application/json"
-}
+    # 合并临时文件为一个 MP4 文件
+    temp_files = sorted(glob(os.path.join(temp_folder, '*.ts')))
+    inputs = [ffmpeg.input(file) for file in temp_files]
+    combined = ffmpeg.concat(*inputs)
+    stream = ffmpeg.output(combined, file_path)
+    ffmpeg.run(stream)
 
-response = requests.get(url, headers=headers)
-print(response)
-print(response.json())
+    # 删除临时文件
+    for file in temp_files:
+        os.remove(file)
+    os.rmdir(temp_folder)

@@ -15,7 +15,14 @@ def creat_project(project_name: str):
     }
     data = {
         "title": project_name,
-        "label_config": "<View><Audio name=\"audio\" value=\"$audio\" /><TextArea name=\"transcription\" value=\"$transcription\" toName=\"audio\" editable=\"true\" rows=\"5\" /></View>"
+        "label_config": '''
+        <View>
+        <Audio name="audio" value="$audio" zoom="true" hotkey="ctrl+enter" />
+        <Header value="修改标签" />
+        <TextArea name="transcription" toName="audio"
+            rows="4" editable="true" maxSubmissions="1" />
+        </View>
+        '''
     }
 
     response = requests.post(url, headers=headers, data=json.dumps(data))
@@ -102,5 +109,5 @@ if __name__ == '__main__':
 
     # 如果有项目就改成自己的id
     # project_id = 10
-    project_id = creat_project("test02")
+    project_id = creat_project("test04")
     upload_labelStudio(project_id)

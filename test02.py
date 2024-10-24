@@ -1,7 +1,8 @@
-a = input("Enter a number: ")
+from moviepy.editor import VideoFileClip, AudioFileClip
+import moviepy.editor as mp
+import os
 
-assert int(a) == 1
-print(1)
-# if int(a) != 1:
-#     print('Not a number')
-#     raise ArithmeticError
+video = mp.VideoFileClip(r"C:\Code\ML\Video\t7.ts")
+audio = video.audio
+audio.write_audiofile(r"C:\Code\ML\Video\t7.mp3")
+print('end')
