@@ -37,7 +37,7 @@ def record_audio():
 
             low_audio_num = 0
             while True:
-                for i in range(10):
+                for i in range(5):
                     data = stream.read(CHUNK)
                     frame.append(data)
 
@@ -51,7 +51,7 @@ def record_audio():
                     data_queue.put(audio_data)
                     low_audio_num = 0
 
-                if low_audio_num == 2:
+                if low_audio_num == 3:
                     flag_queue.put(True)
 
                 if DEBUG:
