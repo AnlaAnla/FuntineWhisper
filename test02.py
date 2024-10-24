@@ -1,8 +1,9 @@
-from moviepy.editor import VideoFileClip, AudioFileClip
-import moviepy.editor as mp
-import os
+import time
 
-video = mp.VideoFileClip(r"C:\Code\ML\Video\t7.ts")
-audio = video.audio
-audio.write_audiofile(r"C:\Code\ML\Video\t7.mp3")
-print('end')
+text = [1,2,3,4,5,6,7]
+for t in text:
+    text = f"文本: "
+    print(f"\r文本: {t}", end="")
+    time.sleep(0.5)
+
+print("\nDone!")

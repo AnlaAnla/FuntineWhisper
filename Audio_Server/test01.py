@@ -16,15 +16,15 @@ RATE = 16000  # 录音时的采样率
 temp_time = time.time()
 
 
-def whisper_audio(filename, model):
-    """Transcribe audio buffer and display."""
-    t1 = time.time()
-    segments, info = model.transcribe(filename, beam_size=5, language="zh", vad_filter=True,
+def whisper_audio(audio_data, model):
+    segments, info = model.transcribe(audio_data, beam_size=5, language="zh", vad_filter=True,
                                       vad_parameters=dict(min_silence_duration_ms=500))
     # print(f"{filename} removed.")
     if segments:
+        print('text:')
         for segment in segments:
-            print("_____: ", segment.text)
+            print(segment.text, end=' ')
+        print()
     # t2 = time.time()
     # print("推理时间: ", t2 - t1)
     # global temp_time
@@ -82,13 +82,16 @@ def Monitor_MIC(th, filename):
                     # 如果有连续15个循环的点，都不是声音信号，就认为音频结束了
                     if len(less) == 1:
                         # audio_name = f"{space_num}.mp3"
-                        audio_name = "temp.mp3"
-                        write_audio(audio_name, p, frames2)
+                        # audio_name = "temp.mp3"
+                        # write_audio(audio_name, p, frames2)
                         # print('写入: ', audio_name)
                         space_num += 1
                         # frames2 = []
 
-                        whisper_audio(audio_name, model)
+                        audio_data = b''.join(frames2)
+                        audio_data = np.frombuffer(audio_data, dtype=np.int16).astype(np.float32) / 32768.0
+
+                        whisper_audio(audio_data, model)
 
                     elif len(less) == 8:
                         frames2 = []
