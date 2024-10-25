@@ -67,7 +67,7 @@ def result2srt(result, srt_save_path=None):
 
 
 if __name__ == '__main__':
-    model_path = "models/whisper-medium-finetune-ct2"
+    model_path = "small"
     media_path = r"D:\Code\ML\Audio\t7.mp3"
 
     # Run on GPU with FP16

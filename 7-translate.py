@@ -31,7 +31,7 @@ def result2srt(result, srt_save_path=None):
         text = segment.text.strip()
         text = convert(text, 'zh-cn')
 
-        print("[%.2fs -> %.2fs] %s" % (segment.start, segment.end, text) )
+        print("[%.2fs -> %.2fs] %s" % (segment.start, segment.end, text))
 
         if text:
             start_time = datetime.timedelta(seconds=segment.start)

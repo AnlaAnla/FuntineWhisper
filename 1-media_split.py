@@ -155,7 +155,7 @@ if __name__ == '__main__':
     data_save_dir = r"D:\Code\ML\Audio\card_audio_data01"
 
     os.environ['KMP_DUPLICATE_LIB_OK'] = 'True'
-    model_size = "medium"
+    model_size = "small"
 
     audio_save_dir = os.path.join(data_save_dir, "audio")
     model = WhisperModel(model_size, device="cuda", compute_type="float16")

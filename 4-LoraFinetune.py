@@ -90,7 +90,8 @@ if __name__ == '__main__':
     os.environ["CUDA_VISIBLE_DEVICES"] = "0"
 
     # model_name_or_path = "openai/whisper-large-v3"
-    model_name_or_path = "openai/whisper-medium"
+    # model_name_or_path = "openai/whisper-medium"
+    model_name_or_path = "openai/whisper-small"
     task = "transcribe"
 
     # 此处加载我的数据集
