@@ -58,7 +58,7 @@ def Monitor_MIC(th, filename):
             frames.append(data)
         audio_data = np.frombuffer(data, dtype=np.int16)
         temp = np.max(audio_data)
-        # print(f'temp 大小为:[{np.min(audio_data)}, {temp}]')
+        print(f'temp 大小为:[{np.min(audio_data)}, {temp}]')
         if temp > th:
             print("detected a signal")
             print('current threshold：', temp)
@@ -75,7 +75,7 @@ def Monitor_MIC(th, filename):
                 audio_data2 = np.frombuffer(data2, dtype=np.int16)
                 temp2 = np.max(audio_data2)
 
-                # print(f'temp2 大小为:[{np.min(audio_data2)}, {temp2}]')
+                print(f'temp2 大小为:[{np.min(audio_data2)}, {temp2}]')
                 if temp2 < th:
                     less.append(-1)
                     print("below threshold, counting: ", less)
@@ -91,7 +91,7 @@ def Monitor_MIC(th, filename):
                         audio_data = b''.join(frames2)
                         audio_data = np.frombuffer(audio_data, dtype=np.int16).astype(np.float32) / 32768.0
 
-                        whisper_audio(audio_data, model)
+                        # whisper_audio(audio_data, model)
 
                     elif len(less) == 8:
                         frames2 = []
@@ -113,9 +113,9 @@ if __name__ == '__main__':
     print("Loading model...")
     device = "cuda" if torch.cuda.is_available() else "cpu"
     print(f"Using {device} device.")
-    model = WhisperModel("base", device=device, local_files_only=True,
-                         compute_type="int8")
+    # model = WhisperModel("base", device=device, local_files_only=True,
+    #                      compute_type="int8")
 
     print("Model loaded.")
 
-    Monitor_MIC(th=200, filename='tt1')
+    Monitor_MIC(th=300, filename='tt1')
