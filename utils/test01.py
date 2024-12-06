@@ -1,4 +1,9 @@
-from fastapi import FastAPI, UploadFile, File
+import numpy as np
+import pandas as pd
 
-print("dadaasd")
-print("aaaaaaaaaaaaaaaa")
+
+def f(x):
+    return x ** 2 + 36
+
+
+print(f(141))

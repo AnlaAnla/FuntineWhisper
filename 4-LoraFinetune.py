@@ -89,13 +89,13 @@ class SavePeftModelCallback(TrainerCallback):
 if __name__ == '__main__':
     os.environ["CUDA_VISIBLE_DEVICES"] = "0"
 
-    # model_name_or_path = "openai/whisper-large-v3"
+    model_name_or_path = "openai/whisper-large-v3-turbo"
     # model_name_or_path = "openai/whisper-medium"
-    model_name_or_path = "openai/whisper-small"
+    # model_name_or_path = "openai/whisper-small"
     task = "transcribe"
 
     # 此处加载我的数据集
-    dataset_name = r"D:\Code\ML\Audio\card_audio_data02"
+    dataset_name = r"D:\Code\ML\Audio\Data1"
     language = "Chinese"
 
     common_voice = DatasetDict()
@@ -132,17 +132,18 @@ if __name__ == '__main__':
         per_device_train_batch_size=8,
         gradient_accumulation_steps=1,  # increase by 2x for every 2x decrease in batch size
         learning_rate=1e-4,
-        warmup_steps=50,
+        warmup_steps=10,
         num_train_epochs=1,
         eval_strategy="steps",
         fp16=True,
         per_device_eval_batch_size=8,
         generation_max_length=128,
-        logging_steps=100,
+        logging_steps=5,
         max_steps=100,  # only for testing purposes, remove this from your final run :)
         remove_unused_columns=False,
         # required as the PeftModel forward doesn't have the signature of the wrapped model's forward
         label_names=["labels"],  # same reason as above
+        report_to="none"
     )
 
     trainer = Seq2SeqTrainer(

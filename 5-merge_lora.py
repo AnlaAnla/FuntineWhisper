@@ -2,7 +2,7 @@ import argparse
 import functools
 import os
 
-from transformers import WhisperForConditionalGeneration, WhisperFeatureExtractor, WhisperTokenizerFast,\
+from transformers import WhisperForConditionalGeneration, WhisperFeatureExtractor, WhisperTokenizerFast, \
     WhisperProcessor
 from peft import PeftModel, PeftConfig
 
@@ -44,12 +44,10 @@ def add_arguments(argname, type, default, help, argparser, **kwargs):
 parser = argparse.ArgumentParser(description=__doc__)
 add_arg = functools.partial(add_arguments, argparser=parser)
 add_arg("lora_model", type=str, default=r"reach-vb/train/checkpoint-100", help="微调保存的模型路径")
-add_arg('output_dir', type=str, default='models/',    help="合并模型的保存目录")
+add_arg('output_dir', type=str, default='models/', help="合并模型的保存目录")
 add_arg("local_files_only", type=bool, default=False, help="是否只在本地加载模型，不尝试下载")
 args = parser.parse_args()
 print_arguments(args)
-
-
 
 # 检查模型文件是否存在
 assert os.path.exists(args.lora_model), f"模型文件{args.lora_model}不存在"
@@ -78,7 +76,7 @@ save_directory = os.path.join(args.output_dir, f'{os.path.basename(peft_config.b
 os.makedirs(save_directory, exist_ok=True)
 
 # 保存模型到指定目录中
-model.save_pretrained(save_directory, max_shard_size='4GB'   )
+model.save_pretrained(save_directory, max_shard_size='4GB')
 feature_extractor.save_pretrained(save_directory)
 tokenizer.save_pretrained(save_directory)
 processor.save_pretrained(save_directory)
