@@ -3,7 +3,7 @@ import numpy as np
 import websockets
 import asyncio
 
-CHUNK = 16000 * 2  # 每次读取的音频数据大小
+CHUNK = 1600  # 每次读取的音频数据大小
 SERVER_URL = "ws://192.168.66.146:2345"  # WebSocket 服务器地址
 
 
