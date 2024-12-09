@@ -5,19 +5,16 @@ import numpy as np
 import requests
 import queue
 import threading
-import os
 import webrtcvad
+import os
 
-CHUNK = 512
+CHUNK = 480
 audio_threshold = 1000  # 语音识别阈值, 使用笔记本电脑内置麦克风则设置为100以内
-VAD_MODE = 3
 
 flag_queue = queue.Queue()  # 清空frame的flag
 data_queue = queue.Queue()  # 数据
 
 SERVER_URL = "http://192.168.66.146:2345/recognize_audio/"  # 替换为服务器的IP地址
-
-vad = webrtcvad.Vad(VAD_MODE)
 
 p = pyaudio.PyAudio()
 stream = p.open(format=pyaudio.paInt16,
@@ -25,6 +22,9 @@ stream = p.open(format=pyaudio.paInt16,
                 rate=16000,
                 input=True,
                 frames_per_buffer=CHUNK)
+
+# 初始化VAD
+vad = webrtcvad.Vad(3)
 
 
 def write_audio(WAVE_OUTPUT_FILENAME, audio_data):
@@ -37,19 +37,6 @@ def write_audio(WAVE_OUTPUT_FILENAME, audio_data):
     wf.setframerate(16000)
     wf.writeframes(audio_data.tobytes())
     wf.close()
-
-
-def get_silence_num(data):
-    speech_num = 0
-    silence_num = 0
-    for i in range(len(data), 160):
-        frame_data = data[i:i + 160]
-        is_speech = vad.is_speech(frame_data.tobytes(), 16000)
-        if is_speech:
-            speech_num += 1
-        else:
-            silence_num += 1
-    print('--->>', speech_num, '/',silence_num)
 
 
 def record_audio():
@@ -65,15 +52,13 @@ def record_audio():
             while True:
                 for i in range(5):
                     data = stream.read(CHUNK)
+                    print(vad.is_speech(data, 16000))
                     frame.append(data)
 
                 audio_data = b''.join(frame)
                 frame = []
                 audio_data = np.frombuffer(audio_data, dtype=np.int16)
                 # print('-->> ', np.max(audio_data), np.linalg.norm(audio_data))
-                # ---
-                get_silence_num(audio_data)
-                # ---
 
                 if np.max(audio_data) < audio_threshold:
                     low_audio_num += 1
@@ -108,8 +93,7 @@ def send_audio_to_server():
                 if response_text == '' or response_text is None:
                     continue
                 else:
-                    print(f"\r识别结果: {response_text}", end="")
-
+                    print(f"\r识别结果: {response.json()['text']}", end="")
             else:
                 print("识别失败")
 
