@@ -14,8 +14,8 @@ app = FastAPI()
 # 加载模型
 device = "cuda" if torch.cuda.is_available() else "cpu"
 
-# model_size = r"D:\Code\ML\Model\Whisper\checkpoint-100-2024Y_12M_04D_15h_24m_32s"
-model_size = "deepdml/faster-whisper-large-v3-turbo-ct2"
+model_size = r"D:\Code\ML\Model\Whisper\checkpoint-100-2024Y_12M_04D_15h_24m_32s"
+# model_size = "deepdml/faster-whisper-large-v3-turbo-ct2"
 # model_size = "medium"
 
 model = WhisperModel(model_size, device=device, local_files_only=True, cpu_threads=6, num_workers=4)
@@ -52,7 +52,7 @@ async def recognize_audio(file: UploadFile = File(...)):
         for segment in segments:
             print("[%.2fs -> %.2fs] %s" % (segment.start, segment.end, segment.text))
             text = convert(segment.text, 'zh-cn')
-            paragraph += text
+            paragraph += f" {text}"
 
     global total_num
     total_num += 1

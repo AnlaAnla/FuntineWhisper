@@ -1,79 +1,72 @@
-import numpy as np
-import websockets
-import asyncio
-import webrtcvad
-from zhconv import convert
+from fastapi import FastAPI, WebSocket
 from faster_whisper import WhisperModel
 import torch
-import json
+import numpy as np
+from zhconv import convert
+import uvicorn
 import os
 import noisereduce as nr
+import asyncio
+import json
 
 os.environ['KMP_DUPLICATE_LIB_OK'] = 'True'
 
-# 初始化 Whisper 模型
+app = FastAPI()
 device = "cuda" if torch.cuda.is_available() else "cpu"
-model_size = "deepdml/faster-whisper-large-v3-turbo-ct2"
-model = WhisperModel(model_size, device=device, local_files_only=True)
-
-# 初始化 VAD
-vad = webrtcvad.Vad(3)  # 设置为最严格模式
-
-# 音频窗口大小和步长（调整为每 2 秒）
-WINDOW_SIZE = 16000 * 2  # 2秒的音频
-STEP_SIZE = 16000  # 每次滑动1秒
-
-# 用于存储音频数据的缓冲区
-audio_buffer = np.array([], dtype=np.int16)
+model_size = r"D:\Code\ML\Model\Whisper\checkpoint-100-2024Y_12M_04D_15h_24m_32s"
+model = WhisperModel(model_size, device=device, local_files_only=True, cpu_threads=6, num_workers=4)
 
 
-def reduce_noise(audio_data):
-    reduced_audio = nr.reduce_noise(y=audio_data, sr=16000)
-    return reduced_audio
+class AudioBuffer:
+    def __init__(self, max_size=32000):  # 2秒的音频
+        self.buffer = np.array([], dtype=np.float32)
+        self.max_size = max_size
+
+    def add_audio(self, audio_data):
+        self.buffer = np.append(self.buffer, audio_data)
+        if len(self.buffer) > self.max_size:
+            self.buffer = self.buffer[-self.max_size:]
+
+    def get_audio(self):
+        return self.buffer.copy()
+
+    def clear(self):
+        self.buffer = np.array([], dtype=np.float32)
 
 
-async def handle_audio_stream(websocket, path):
-    global audio_buffer
+@app.websocket("/ws")
+async def websocket_endpoint(websocket: WebSocket):
+    await websocket.accept()
+    audio_buffer = AudioBuffer()
 
     try:
-        async for message in websocket:
-            audio_data = np.frombuffer(message, dtype=np.float32)
+        while True:
+            data = await websocket.receive_bytes()
+            audio_chunk = np.frombuffer(data, dtype=np.float32)
 
-            # 降噪处理
-            audio_data = reduce_noise(audio_data)
+            # 添加音频数据到缓冲区
+            audio_buffer.add_audio(audio_chunk)
+            print(len(audio_buffer.buffer))
 
-            # 将音频数据加入缓冲区
-            audio_buffer = np.append(audio_buffer, audio_data)
+            # 当缓冲区达到一定大小时进行识别
+            if len(audio_buffer.buffer) >= 4800:  # 1秒的音频
+                audio_data = audio_buffer.get_audio()
+                audio_buffer.clear()
 
-            # 滑动窗口处理
-            while len(audio_buffer) >= WINDOW_SIZE:
-                window_data = audio_buffer[:WINDOW_SIZE]
-                audio_buffer = audio_buffer[STEP_SIZE:]  # 移动窗口，去除已识别的部分
+                # 降噪
+                audio_data = nr.reduce_noise(y=audio_data, sr=16000)
 
-                # # 对窗口数据进行 VAD 判断，检测是否为语音
-                # if vad.is_speech(window_data.tobytes(), 16000):
-                # 使用 Whisper 模型进行语音识别
+                # 识别
+                segments, _ = model.transcribe(audio_data, beam_size=1, language="zh", vad_filter=True)
+                text = ''.join([convert(segment.text, 'zh-cn') for segment in segments])
 
-                segments, info = model.transcribe(window_data, beam_size=5, language="zh", vad_filter=True)
-                result = "".join([segment.text for segment in segments])
-                result = convert(result, 'zh-cn')
-
-                print(f"识别结果: {result}")
-                # 将识别结果发送回客户端
-                await websocket.send(json.dumps({"text": result}, ensure_ascii=False))
+                if text.strip():  # 只有在有识别结果时才发送
+                    print(text)
+                    await websocket.send_json({"text": text})
 
     except Exception as e:
-        print(f"发生错误: {e}")
-    finally:
-        print("客户端断开连接")
-
-
-# 启动 WebSocket 服务器
-async def main():
-    server = await websockets.serve(handle_audio_stream, "0.0.0.0", 2345)
-    print("WebSocket 服务器已启动，监听端口 2345...")
-    await server.wait_closed()
+        print(f"Error: {str(e)}")
 
 
 if __name__ == "__main__":
-    asyncio.run(main())
+    uvicorn.run(app, host="0.0.0.0", port=2345)
