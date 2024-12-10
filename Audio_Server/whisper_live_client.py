@@ -1,3 +1,7 @@
+# from whisper_live.client import TranscriptionClient
+import sys
+import os
+sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 from whisper_live.client import TranscriptionClient
 
 if __name__ == '__main__':
