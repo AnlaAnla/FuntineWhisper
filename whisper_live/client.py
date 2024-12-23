@@ -118,16 +118,22 @@ class Client:
                       (not self.transcript or
                         float(seg['start']) >= float(self.transcript[-1]['end']))):
                     self.transcript.append(seg)
+                    print('\r', end='', flush=True)
+                    print(f"[{seg['text']}]", flush=True)
+                    self.log_transcription = False
         # update last received segment and last valid response time
         if self.last_received_segment is None or self.last_received_segment != segments[-1]["text"]:
             self.last_response_received = time.time()
             self.last_received_segment = segments[-1]["text"]
 
         if self.log_transcription:
+            print(f"\r{text[-1]}", end='', flush=True)
             # Truncate to last 3 entries for brevity.
-            text = text[-3:]
-            utils.clear_screen()
-            utils.print_transcript(text)
+            # text = text[-3:]
+            # utils.clear_screen()
+            # utils.print_transcript(text)
+        self.log_transcription = True
+
 
     def on_message(self, ws, message):
         """

@@ -44,7 +44,7 @@
           </mappings>
         </serverdata>
       </paths>
-      <paths name="martin@192.168.66.117 password">
+      <paths name="martin@192.168.31.116 password">
         <serverdata>
           <mappings>
             <mapping local="$PROJECT_DIR$" web="/" />
